@@ -148,4 +148,31 @@ export default {
     name: 'March of the Legion',
     icon: 'ability_warlock_fireandbrimstone',
   },
+
+  // Concordance
+  CONCORDANCE_TRAIT: {
+    id: 239042,
+    name: 'Concordance of the Legionfall',
+    icon: 'achievement_faction_legionfall',
+  },
+  CONCORDANCE_STRENGTH: {
+    id: 242583,
+    name: 'Concordance of the Legionfall',
+    icon: 'achievement_faction_legionfall',
+  },
+  CONCORDANCE_AGILITY: {
+    id: 242584,
+    name: 'Concordance of the Legionfall',
+    icon: 'achievement_faction_legionfall',
+  },
+  CONCORDANCE_INTELLECT: {
+    id: 242586,
+    name: 'Concordance of the Legionfall',
+    icon: 'achievement_faction_legionfall',
+  },
+  CONCORDANCE_VERSATILITY: {
+    id: 243096,
+    name: 'Concordance of the Legionfall',
+    icon: 'achievement_faction_legionfall',
+  },
 };

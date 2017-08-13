@@ -385,6 +385,11 @@ export default {
     name: 'Scintillating Moonlight',
     icon: 'spell_nature_starfall',
   },
+  REINFORCED_FUR_TRAIT: {
+    id: 200395,
+    name: 'Reinforced Fur',
+    icon: 'spell_druid_malfurionstenacity',
+  },
   GORE_BEAR: {
     id: 93622,
     name: 'Gore',

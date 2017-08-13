@@ -18,6 +18,7 @@ import MainCombatLogParser from 'Parser/Core/CombatLogParser';
 import ISSUE_IMPORTANCE from 'Parser/Core/ISSUE_IMPORTANCE';
 
 import CastEfficiency from './Modules/Features/CastEfficiency';
+import Mitigation from './Modules/Features/Mitigation';
 
 import Gore from './Modules/Features/Gore';
 import GalacticGuardian from './Modules/Features/GalacticGuardian';
@@ -70,6 +71,7 @@ class CombatLogParser extends MainCombatLogParser {
     goreProcs: Gore,
     galacticGuardianProcs: GalacticGuardian,
     guardianOfEluneProcs: GuardianOfElune,
+    // mitigation: Mitigation,
 
     // Legendaries:
     dualDetermination: DualDetermination,
@@ -100,7 +102,7 @@ class CombatLogParser extends MainCombatLogParser {
 
     const totalIronFurTime = this.selectedCombatant.getBuffUptime(SPELLS.IRONFUR.id);
     const pulverizeUptimePercentage = this.selectedCombatant.getBuffUptime(SPELLS.PULVERIZE_BUFF.id) / this.fightDuration;
-    
+
     if (nonDpsTimePercentage > 0.3) {
       results.addIssue({
         issue: `Your non DPS time can be improved. Try to cast damaging spells more regularly.`,
