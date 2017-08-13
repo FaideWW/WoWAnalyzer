@@ -390,6 +390,26 @@ export default {
     name: 'Reinforced Fur',
     icon: 'spell_druid_malfurionstenacity',
   },
+  IRON_CLAWS_TRAIT: {
+    id: 215061,
+    name: 'Iron Claws',
+    icon: 'Inv_knife_1h_pvphorde_a_01',
+  },
+  FORTITUDE_OF_THE_CENARION_CIRCLE_TRAIT: {
+    id: 241101,
+    name: 'Fortitude of the Cenarion Circle',
+    icon: 'misc_legionfall_druid',
+  },
+  URSOCS_BOND_TRAIT: {
+    id: 214912,
+    name: 'Ursoc\'s Bond',
+    icon: 'inv_hand_1h_artifactursoc_d_01dual',
+  },
+  SHARPENED_INSTINCTS_TRAIT: {
+    id: 200415,
+    name: 'Sharpened Instincts',
+    icon: 'spell_druid_savagery',
+  },
   GORE_BEAR: {
     id: 93622,
     name: 'Gore',

@@ -88,6 +88,7 @@ class CombatLogParser extends MainCombatLogParser {
 
   generateResults() {
     const results = super.generateResults();
+    console.log(this.modules.mitigation.damageEvents);
 
     const fightDuration = this.fightDuration;
 
