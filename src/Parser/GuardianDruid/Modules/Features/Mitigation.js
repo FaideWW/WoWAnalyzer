@@ -167,7 +167,6 @@ class Mitigation extends Module {
   damageEvents = [];
   damageReductions = [ guardianArmorModifier, versatilityModifier, guardianDRs ];
   on_initialized() {
-    console.log(this.owner.selectedCombatant);
     this.damageReductions.forEach((dr) => {
       if (dr.on_initialized) {
         dr.on_initialized.apply(dr, [this.owner.selectedCombatant]);
@@ -220,6 +219,7 @@ class Mitigation extends Module {
     });
 
     this.damageEvents.push({
+      timestamp: event.timestamp,
       damageBeforeDR,
       absorbed: event.absorbed,
       damageAfterDR,

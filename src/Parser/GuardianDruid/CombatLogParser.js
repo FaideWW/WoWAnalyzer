@@ -14,6 +14,7 @@ import StatisticBox from 'Main/StatisticBox';
 import SuggestionsTab from 'Main/SuggestionsTab';
 import Tab from 'Main/Tab';
 import Talents from 'Main/Talents';
+import DamageTaken from 'Main/DamageTaken';
 import MainCombatLogParser from 'Parser/Core/CombatLogParser';
 import ISSUE_IMPORTANCE from 'Parser/Core/ISSUE_IMPORTANCE';
 
@@ -71,7 +72,7 @@ class CombatLogParser extends MainCombatLogParser {
     goreProcs: Gore,
     galacticGuardianProcs: GalacticGuardian,
     guardianOfEluneProcs: GuardianOfElune,
-    // mitigation: Mitigation,
+    mitigation: Mitigation,
 
     // Legendaries:
     dualDetermination: DualDetermination,
@@ -88,7 +89,6 @@ class CombatLogParser extends MainCombatLogParser {
 
   generateResults() {
     const results = super.generateResults();
-    console.log(this.modules.mitigation.damageEvents);
 
     const fightDuration = this.fightDuration;
 
@@ -278,6 +278,19 @@ class CombatLogParser extends MainCombatLogParser {
             <Talents combatant={this.selectedCombatant} />
           </Tab>
         ),
+      },
+      {
+        title: 'Damage Taken',
+        url: 'damage-taken',
+        render: () => (
+          <Tab title="Damage Taken" style={{ pdading: '15px 22px' }}>
+            <DamageTaken
+              damageEvents={this.modules.mitigation.damageEvents}
+              start={this.fight.start_time}
+              end={this.fight.end_time}
+            />
+          </Tab>
+        )
       },
       ...results.tabs,
     ];
