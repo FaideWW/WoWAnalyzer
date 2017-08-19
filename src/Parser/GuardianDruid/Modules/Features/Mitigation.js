@@ -2,6 +2,8 @@ import Module from 'Parser/Core/Module';
 import SPELLS from 'common/SPELLS';
 import ITEMS from 'common/ITEMS';
 
+// TODO: Account for Adaptive Fur, externals
+
 const VERS_RATING_TO_PERCENT = 475;
 
 const K_TABLE = {

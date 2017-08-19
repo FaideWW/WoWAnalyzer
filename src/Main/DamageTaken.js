@@ -7,10 +7,22 @@ import 'chartist-plugin-legend';
 
 import './DamageTaken.css';
 
-const formatDuration = (duration) => {
+// TODO: Overlay for active threat
+
+
+function formatDuration(duration) {
   const seconds = Math.floor(duration % 60);
   return `${Math.floor(duration / 60)}:${seconds < 10 ? `0${seconds}` : seconds}`;
-};
+}
+
+function formatDamage(value) {
+  if (value >= 1000000) {
+    return `${Math.round(value / 1000000)}M`;
+  } else if (value >= 1000) {
+    return `${Math.round(value / 1000)}K`;
+  }
+  return Math.round(value);
+}
 
 export default function DamageTaken({ damageEvents, start, end }) {
   const fightDurationSec = Math.ceil((end - start) / 1000);
@@ -20,7 +32,7 @@ export default function DamageTaken({ damageEvents, start, end }) {
   let currentEventIndex = 0;
   let maxDamageTaken = 0;
   for (let i = 0; i < fightDurationSec; i += 1) {
-    labels.push[i];
+    labels.push(i);
 
     let unmitigatedAverage = 0;
     let mitigatedAverage = 0;
@@ -44,8 +56,6 @@ export default function DamageTaken({ damageEvents, start, end }) {
     mitigatedDamageAverages.push(mitigatedAverage);
   }
 
-  console.log('[unmitigated]', unmitigatedDamageAverages);
-  console.log('[mitigated]', mitigatedDamageAverages);
   const chartData = {
     labels,
     series: [
@@ -66,6 +76,8 @@ export default function DamageTaken({ damageEvents, start, end }) {
 
   return (
     <div>
+      This graph shows damage intake over the course of a fight. The goal is to keep Damage after Mitigation as low and as consistent as possible.  Spikes in the graph may indicate improper use of defensives/active mitigation.
+      <br /><br />
       <ChartistGraph
         data={chartData}
         options={{
@@ -94,6 +106,7 @@ export default function DamageTaken({ damageEvents, start, end }) {
           axisY: {
             onlyInteger: true,
             offset: 35,
+            labelInterpolationFnc: formatDamage,
           },
           plugins: [
             Chartist.plugins.legend({
