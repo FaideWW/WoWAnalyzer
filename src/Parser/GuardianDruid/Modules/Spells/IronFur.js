@@ -7,18 +7,35 @@ import Module from 'Parser/Core/Module';
 import Combatants from 'Parser/Core/Modules/Combatants';
 import SPELLS from 'common/SPELLS';
 
-const debug = false;
+const DURATION_PER_UE_RANK = 0.5;
 
 class IronFur extends Module {
   static dependencies = {
     combatants: Combatants,
   };
 
+  _stacksArray = [];
+  ironfurDuration = 6;
+
   lastIronfurBuffApplied = 0;
   physicalHitsWithIronFur = 0;
   physicalDamageWithIronFur = 0;
   physicalHitsWithoutIronFur = 0;
   physicalDamageWithoutIronFur = 0;
+
+  on_initialized() {
+    const ueRank = this.combatants.selected.traitsBySpellId[SPELLS.URSOCS_ENDURANCE.id];
+    this.ironfurDuration += (ueRank * DURATION_PER_UE_RANK);
+  }
+
+  on_byPlayer_cast(event) {
+    if (event.ability.guid === SPELLS.IRONFUR.id) {
+      const timestamp = event.timestamp;
+      const hasGoE = this.combatants.selected.hasBuff(SPELLS.GUARDIAN_OF_ELUNE.id, timestamp);
+      const duration = (this.ironfurDuration + (hasGoE ? 2 : 0)) * 1000;
+      this.addStack(timestamp, timestamp + duration);
+    }
+  }
 
   on_byPlayer_applybuff(event) {
     const spellId = event.ability.guid;
@@ -49,13 +66,37 @@ class IronFur extends Module {
   }
 
   on_finished() {
-    if (debug) {
-      console.log('Hits with ironfur ' + this.physicalHitsWithIronFur);
-      console.log('Damage with ironfur ' + this.physicalDamageWithIronFur);
-      console.log('Hits without ironfur ' + this.physicalHitsWithoutIronFur);
-      console.log('Damage without ironfur ' + this.physicalDamageWithoutIronFur);
-      console.log('Total physical ' + this.physicalDamageWithoutIronFur + this.physicalDamageWithIronFur);
+    console.log(this._stacksArray);
+  }
+
+  getMostRecentStackIndex(timestamp) {
+    let i = this._stacksArray.length - 1;
+    while (i >= 0 && this._stacksArray[i].timestamp > timestamp) {
+      i--;
     }
+    return i;
+  }
+  getStackCount(timestamp) {
+    const index = this.getMostRecentStackIndex(timestamp);
+    return this._stacksArray[index].stackCount;
+  }
+
+  addStack(stackStart, stackEnd) {
+    const index = this.getMostRecentStackIndex(stackStart);
+    if (index === -1) {
+      this._stacksArray.push({ timestamp: stackStart, stackCount: 1 });
+      this._stacksArray.push({ timestamp: stackEnd, stackCount: 0 });
+      return;
+    }
+
+    const stackCount = this._stacksArray[index].stackCount;
+    this._stacksArray.splice(index + 1, 0, { timestamp: stackStart, stackCount });
+    let i = index + 1;
+    while (i < this._stacksArray.length && this._stacksArray[i].timestamp < stackEnd) {
+      this._stacksArray[i].stackCount += 1;
+      i += 1;
+    }
+    this._stacksArray.splice(i - 1, 0, { timestamp: stackEnd, stackCount });
   }
 
   suggestions(when) {
