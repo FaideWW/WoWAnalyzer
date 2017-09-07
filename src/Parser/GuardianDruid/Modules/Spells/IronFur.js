@@ -3,9 +3,12 @@ import { formatPercentage, formatThousands } from 'common/format';
 import SpellIcon from 'common/SpellIcon';
 import SpellLink from 'common/SpellLink';
 import StatisticBox, { STATISTIC_ORDER } from 'Main/StatisticBox';
+import Tab from 'Main/Tab';
 import Module from 'Parser/Core/Module';
 import Combatants from 'Parser/Core/Modules/Combatants';
 import SPELLS from 'common/SPELLS';
+
+import IronfurGraph from './IronfurGraph';
 
 const DURATION_PER_UE_RANK = 0.5;
 
@@ -48,6 +51,13 @@ class IronFur extends Module {
     const spellId = event.ability.guid;
     if (SPELLS.IRONFUR.id === spellId) {
       this.lastIronfurBuffApplied = 0;
+    }
+
+    if (SPELLS.BEAR_FORM.id === spellId) {
+      // Truncate the array and immediately cancel all stacks
+      const index = this.getMostRecentStackIndex(event.timestamp);
+      this._stacksArray.length = index + 1;
+      this._stacksArray.push({ timestamp: event.timestamp, stackCount: 0 });
     }
   }
 
@@ -92,11 +102,13 @@ class IronFur extends Module {
     const stackCount = this._stacksArray[index].stackCount;
     this._stacksArray.splice(index + 1, 0, { timestamp: stackStart, stackCount });
     let i = index + 1;
+    let finalStackCount = stackCount;
     while (i < this._stacksArray.length && this._stacksArray[i].timestamp < stackEnd) {
       this._stacksArray[i].stackCount += 1;
+      finalStackCount = this._stacksArray[i].stackCount;
       i += 1;
     }
-    this._stacksArray.splice(i - 1, 0, { timestamp: stackEnd, stackCount });
+    this._stacksArray.splice(i, 0, { timestamp: stackEnd, stackCount: finalStackCount - 1 });
   }
 
   suggestions(when) {
@@ -131,6 +143,23 @@ class IronFur extends Module {
       />
     );
   }
+
+  tab() {
+    return {
+      title: 'Ironfur',
+      url: 'ironfur',
+      render: () => (
+        <Tab title="Ironfur">
+          <IronfurGraph
+            start={this.owner.fight.start_time}
+            end={this.owner.fight.end_time}
+            stackData={this._stacksArray}
+          />
+        </Tab>
+      ),
+    };
+  }
+
   statisticOrder = STATISTIC_ORDER.CORE(10);
 }
 
