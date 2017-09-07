@@ -1,0 +1,64 @@
+.ct-legend {
+  position: relative;
+  z-index: 10;
+  list-style: none;
+  text-align: center;
+  margin-bottom: 0;
+}
+.ct-legend li {
+  position: relative;
+  padding-left: 19px;
+  margin-right: 10px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  display: inline-block;
+}
+.ct-legend li:before {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: .3em;
+  left: 0;
+  content: '';
+  border: 3px solid transparent;
+  border-radius: 2px;
+}
+.ct-legend li.inactive:before {
+  background: transparent;
+}
+.ct-legend.ct-legend-inside {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.ct-legend.ct-legend-inside li{
+  display: block;
+  margin: 0;
+}
+
+.ct-line {
+  stroke-width: 2px;
+}
+.ct-grid {
+  stroke: rgba(255, 255, 255, 0.35);
+}
+.ct-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1em;
+  line-height: 1;
+}
+.ct-label.ct-vertical {
+  line-height: 0;
+}
+
+.ct-series.stacks .ct-bar, .ct-series.stacks .ct-line, .ct-series.stacks .ct-point, .ct-series.stacks .ct-slice-donut {
+  stroke: #026dd7;
+}
+.ct-series.stacks .ct-area, .ct-series.stacks .ct-slice-donut-solid, .ct-series.stacks .ct-slice-pie {
+  fill: #022ad7;
+  fill-opacity: 0.2;
+}
+.ct-legend .stacks:before {
+  background-color: #026dd7;
+  border-color: #026dd7;
+}
