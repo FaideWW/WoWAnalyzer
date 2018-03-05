@@ -132,19 +132,29 @@ class AntiFillerSpam extends Analyzer {
     );
   }
 
+  get suggestionThresholds() {
+    return {
+      actual: this.fillerSpamPercentage,
+      isGreaterThan: {
+        minor: 0.1,
+        average: 0.15,
+        major: 0.2,
+      },
+      style: 'percentage',
+    };
+  }
+
   suggestions(when) {
-    when(this.fillerSpamPercentage).isGreaterThan(0.1)
-      .addSuggestion((suggest, actual, recommended) => {
-        return suggest(
-          <Wrapper>
-            You are casting too many unnecessary filler spells. Try to plan your casts two or three GCDs ahead of time to anticipate your main rotational spells coming off cooldown, and to give yourself time to react to <SpellLink id={SPELLS.GORE_BEAR.id} /> and <SpellLink id={SPELLS.GALACTIC_GUARDIAN_TALENT.id} /> procs.
-          </Wrapper>
-        )
-          .icon(SPELLS.SWIPE_BEAR.icon)
-          .actual(`${formatPercentage(actual)}% unnecessary filler spells cast`)
-          .recommended(`${formatPercentage(recommended, 0)}% or less is recommended`)
-          .regular(recommended + 0.05).major(recommended + 0.1);
-      });
+    when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) => {
+      return suggest(
+        <Wrapper>
+          You are casting too many unnecessary filler spells. Try to plan your casts two or three GCDs ahead of time to anticipate your main rotational spells coming off cooldown, and to give yourself time to react to <SpellLink id={SPELLS.GORE_BEAR.id} /> and <SpellLink id={SPELLS.GALACTIC_GUARDIAN_TALENT.id} /> procs.
+        </Wrapper>
+      )
+        .icon(SPELLS.SWIPE_BEAR.icon)
+        .actual(`${formatPercentage(actual)}% unnecessary filler spells cast`)
+        .recommended(`${formatPercentage(recommended, 0)}% or less is recommended`);
+    });
   }
 }
 

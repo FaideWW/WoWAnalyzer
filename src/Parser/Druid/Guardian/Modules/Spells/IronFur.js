@@ -3,6 +3,7 @@ import { formatPercentage } from 'common/format';
 import SCHOOLS from 'common/MAGIC_SCHOOLS';
 import SpellIcon from 'common/SpellIcon';
 import SpellLink from 'common/SpellLink';
+import Wrapper from 'common/Wrapper';
 import StatisticBox, { STATISTIC_ORDER } from 'Main/StatisticBox';
 import Analyzer from 'Parser/Core/Analyzer';
 import Combatants from 'Parser/Core/Modules/Combatants';
@@ -157,15 +158,30 @@ class IronFur extends Analyzer {
     }
   }
 
+  get suggestionThresholds() {
+    return {
+      actual: this.percentOfHitsMitigated,
+      isLessThan: {
+        minor: 0.9,
+        average: 0.8,
+        major: 0.7,
+      },
+      style: 'percentage',
+    };
+  }
+
   suggestions(when) {
 
-    when(this.percentOfHitsMitigated).isLessThan(0.90)
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>You only had the <SpellLink id={SPELLS.IRONFUR.id} /> buff for {formatPercentage(actual)}% of physical damage taken. You should have the Ironfur buff up to mitigate as much physical damage as possible.</span>)
+        return suggest(
+          <Wrapper>
+            You only had the <SpellLink id={SPELLS.IRONFUR.id} /> buff for {formatPercentage(actual)}% of physical damage taken. You should have the Ironfur buff up to mitigate as much physical damage as possible.
+          </Wrapper>
+        )
           .icon(SPELLS.IRONFUR.icon)
           .actual(`${formatPercentage(actual)}% was mitigated by Ironfur`)
-          .recommended(`${Math.round(formatPercentage(recommended))}% or more is recommended`)
-          .regular(recommended - 0.10).major(recommended - 0.2);
+          .recommended(`${Math.round(formatPercentage(recommended))}% or more is recommended`);
       });
   }
 

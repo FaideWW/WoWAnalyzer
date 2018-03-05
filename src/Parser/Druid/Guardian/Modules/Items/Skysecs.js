@@ -3,6 +3,7 @@ import React from 'react';
 import SPELLS from 'common/SPELLS';
 import ITEMS from 'common/ITEMS';
 import ItemLink from 'common/ItemLink';
+import Wrapper from 'common/Wrapper';
 import Analyzer from 'Parser/Core/Analyzer';
 import Combatants from 'Parser/Core/Modules/Combatants';
 
@@ -122,14 +123,29 @@ class SkysecsHold extends Analyzer {
     };
   }
 
+  get suggestionThresholds() {
+    return {
+      actual: this.efficiency,
+      isLessThan: {
+        minor: 0.9,
+        average: 0.85,
+        major: 0.8,
+      },
+      style: 'percentage',
+    };
+  }
+
   suggestions(when) {
-    when(this.efficiency).isLessThan(0.9)
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>Your <ItemLink id={ITEMS.SKYSECS_HOLD.id} /> efficiency was {formatPercentage(this.efficiency)}%.  Consider using another legendary if you cannot get close to full effectiveness from its extra heal, as this makes <ItemLink id={ITEMS.SKYSECS_HOLD.id} /> a poor legendary.</span>)
+        return suggest(
+          <Wrapper>
+            Your <ItemLink id={ITEMS.SKYSECS_HOLD.id} /> efficiency was {formatPercentage(actual)}%.  Consider using another legendary if you cannot get close to full effectiveness from its extra heal, as this makes <ItemLink id={ITEMS.SKYSECS_HOLD.id} /> a poor legendary.
+          </Wrapper>
+        )
           .icon(ITEMS.SKYSECS_HOLD.icon)
           .actual(`${formatPercentage(actual)}% efficiency`)
-          .recommended(`>${formatPercentage(recommended, 0)}% is recommended`)
-          .regular(recommended - 0.05).major(recommended - 0.1);
+          .recommended(`>${formatPercentage(recommended, 0)}% is recommended`);
       });
   }
 }

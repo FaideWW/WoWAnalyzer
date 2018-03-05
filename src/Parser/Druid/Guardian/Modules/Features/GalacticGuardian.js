@@ -2,6 +2,7 @@ import React from 'react';
 import { formatPercentage } from 'common/format';
 import SpellIcon from 'common/SpellIcon';
 import SpellLink from 'common/SpellLink';
+import Wrapper from 'common/Wrapper';
 import StatisticBox, { STATISTIC_ORDER } from 'Main/StatisticBox';
 import Analyzer from 'Parser/Core/Analyzer';
 import SPELLS from 'common/SPELLS';
@@ -66,25 +67,41 @@ class GalacticGuardian extends Analyzer {
     }
   }
 
+  get unusedGGProcsPercentage() {
+    return 1 - (this.consumedGGProc / this.GGProcsTotal);
+  }
+
+  get suggestionThresholds() {
+    return {
+      actual: this.unusedGGProcsPercentage,
+      isGreaterThan: {
+        minor: 0.3,
+        average: 0.45,
+        major: 0.6,
+      },
+      style: 'percentage',
+    };
+  }
+
   suggestions(when) {
-    const unusedGGProcs = 1 - (this.consumedGGProc / this.GGProcsTotal);
-    when(unusedGGProcs).isGreaterThan(0.3)
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>You wasted {formatPercentage(unusedGGProcs)}% of your <SpellLink id={SPELLS.GALACTIC_GUARDIAN.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.</span>)
+        return suggest(
+          <Wrapper>
+            You wasted {formatPercentage(actual)}% of your <SpellLink id={SPELLS.GALACTIC_GUARDIAN.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.
+          </Wrapper>
+        )
           .icon(SPELLS.GALACTIC_GUARDIAN.icon)
-          .actual(`${formatPercentage(unusedGGProcs)}% unused`)
-          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`)
-          .regular(recommended + 0.15).major(recommended + 0.3);
+          .actual(`${formatPercentage(actual)}% unused`)
+          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`);
       });
   }
 
   statistic() {
-    const unusedGGProcs = 1 - (this.consumedGGProc / this.GGProcsTotal);
-
     return (
       <StatisticBox
         icon={<SpellIcon id={SPELLS.GALACTIC_GUARDIAN.id} />}
-        value={`${formatPercentage(unusedGGProcs)}%`}
+        value={`${formatPercentage(this.unusedGGProcsPercentage)}%`}
         label="Unused Galactic Guardian"
         tooltip={`You got total <b>${this.GGProcsTotal}</b> galactic guardian procs and <b>used ${this.consumedGGProc}</b> of them.`}
       />

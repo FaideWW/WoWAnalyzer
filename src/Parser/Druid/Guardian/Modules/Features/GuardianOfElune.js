@@ -2,6 +2,7 @@ import React from 'react';
 import { formatPercentage } from 'common/format';
 import SpellIcon from 'common/SpellIcon';
 import SpellLink from 'common/SpellLink';
+import Wrapper from 'common/Wrapper';
 import StatisticBox, { STATISTIC_ORDER } from 'Main/StatisticBox';
 import Analyzer from 'Parser/Core/Analyzer';
 import SPELLS from 'common/SPELLS';
@@ -89,26 +90,41 @@ class GuardianOfElune extends Analyzer {
     }
   }
 
-  suggestions(when) {
-    const unusedGoEProcs = 1 - (this.consumedGoEProc / this.GoEProcsTotal);
+  get unusedGoEProcsPercentage() {
+    return 1 - (this.consumedGoEProc / this.GoEProcsTotal);
+  }
 
-    when(unusedGoEProcs).isGreaterThan(0.3)
+  get suggestionThresholds() {
+    return {
+      actual: this.unusedGoEProcsPercentage,
+      isGreaterThan: {
+        minor: 0.3,
+        average: 0.45,
+        major: 0.6,
+      },
+      style: 'percentage',
+    };
+  }
+
+  suggestions(when) {
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>You wasted {formatPercentage(unusedGoEProcs)}% of your <SpellLink id={SPELLS.GUARDIAN_OF_ELUNE.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.</span>)
+        return suggest(
+          <Wrapper>
+            You wasted {formatPercentage(actual)}% of your <SpellLink id={SPELLS.GUARDIAN_OF_ELUNE.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.
+          </Wrapper>
+        )
           .icon(SPELLS.GUARDIAN_OF_ELUNE.icon)
-          .actual(`${formatPercentage(unusedGoEProcs)}% unused`)
-          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`)
-          .regular(recommended + 0.15).major(recommended + 0.3);
+          .actual(`${formatPercentage(actual)}% unused`)
+          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`);
       });
   }
 
   statistic() {
-    const unusedGoEProcs = 1 - (this.consumedGoEProc / this.GoEProcsTotal);
-
     return (
       <StatisticBox
         icon={<SpellIcon id={SPELLS.GUARDIAN_OF_ELUNE.id} />}
-        value={`${formatPercentage(unusedGoEProcs)}%`}
+        value={`${formatPercentage(this.unusedGoEProcsPercentage)}%`}
         label="Unused Guardian of Elune"
         tooltip={`You got total <b>${this.GoEProcsTotal}</b> guardian of elune procs and <b>used ${this.consumedGoEProc}</b> of them.`}
       />

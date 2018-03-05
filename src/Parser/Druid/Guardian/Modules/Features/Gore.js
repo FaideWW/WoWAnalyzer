@@ -3,6 +3,7 @@ import React from 'react';
 import { formatPercentage } from 'common/format';
 import SpellIcon from 'common/SpellIcon';
 import SpellLink from 'common/SpellLink';
+import Wrapper from 'common/Wrapper';
 import StatisticBox, { STATISTIC_ORDER } from 'Main/StatisticBox';
 import Analyzer from 'Parser/Core/Analyzer';
 import SpellUsable from 'Parser/Core/Modules/SpellUsable';
@@ -69,26 +70,41 @@ class Gore extends Analyzer {
     }
   }
 
-  suggestions(when) {
-    const unusedGoreProcs = 1 - (this.consumedGoreProc / this.totalProcs);
+  get unusedGoreProcsPercentage() {
+    return 1 - (this.consumedGoreProc / this.totalProcs);
+  }
 
-    when(unusedGoreProcs).isGreaterThan(0.3)
+  get suggestionThresholds() {
+    return {
+      actual: this.unusedGoreProcsPercentage,
+      isGreaterThan: {
+        minor: 0.3,
+        average: 0.45,
+        major: 0.6,
+      },
+      style: 'percentage',
+    };
+  }
+
+  suggestions(when) {
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>You wasted {formatPercentage(unusedGoreProcs)}% of your <SpellLink id={SPELLS.GORE_BEAR.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.</span>)
+        return suggest(
+          <Wrapper>
+            You wasted {formatPercentage(actual)}% of your <SpellLink id={SPELLS.GORE_BEAR.id} /> procs. Try to use the procs as soon as you get them so they are not overwritten.
+          </Wrapper>
+        )
           .icon(SPELLS.GORE_BEAR.icon)
-          .actual(`${formatPercentage(unusedGoreProcs)}% unused`)
-          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`)
-          .regular(recommended + 0.15).major(recommended + 0.3);
+          .actual(`${formatPercentage(actual)}% unused`)
+          .recommended(`${Math.round(formatPercentage(recommended))}% or less is recommended`);
       });
   }
 
   statistic() {
-    const unusedGoreProcs = 1 - (this.consumedGoreProc / this.totalProcs);
-
     return (
       <StatisticBox
         icon={<SpellIcon id={SPELLS.GORE_BEAR.id} />}
-        value={`${formatPercentage(unusedGoreProcs)}%`}
+        value={`${formatPercentage(this.unusedGoreProcsPercentage)}%`}
         label="Unused Gore Procs"
         tooltip={`You got total <b>${this.totalProcs}</b> gore procs and <b>used ${this.consumedGoreProc}</b> of them.`}
       />

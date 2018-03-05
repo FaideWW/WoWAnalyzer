@@ -4,6 +4,7 @@ import SPELLS from 'common/SPELLS';
 import RESOURCE_TYPES from 'common/RESOURCE_TYPES';
 import SpellLink from 'common/SpellLink';
 import SpellIcon from 'common/SpellIcon';
+import Wrapper from 'common/Wrapper';
 import StatisticBox from 'Main/StatisticBox';
 import Analyzer from 'Parser/Core/Analyzer';
 
@@ -104,14 +105,29 @@ class RageWasted extends Analyzer {
       .reduce((str, spell) => `${str}<br />${spell.name}: ${spell.waste}`, 'Rage wasted per spell:');
   }
 
+  get suggestionThresholds() {
+    return {
+      actual: this.wastedRageRatio,
+      isGreaterThan: {
+        minor: 0,
+        average: 0.02,
+        major: 0.05,
+      },
+      style: 'percentage',
+    };
+  }
+
   suggestions(when) {
-    when(this.wastedRageRatio).isGreaterThan(0)
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<span>You are wasting rage.  Try to spend rage before you reach the rage cap so you aren't losing out on potential <SpellLink id={SPELLS.IRONFUR.id} />s or <SpellLink id={SPELLS.MAUL.id} />s.</span>)
+        return suggest(
+          <Wrapper>
+            You are wasting rage.  Try to spend rage before you reach the rage cap so you aren't losing out on potential <SpellLink id={SPELLS.IRONFUR.id} />s or <SpellLink id={SPELLS.MAUL.id} />s.
+          </Wrapper>
+        )
           .icon(SPELLS.BRISTLING_FUR.icon)
           .actual(`${formatPercentage(actual)}% wasted rage`)
-          .recommended(`${formatPercentage(recommended)}% is recommended`)
-          .regular(recommended + 0.02).major(recommended + 0.05);
+          .recommended(`${formatPercentage(recommended)}% is recommended`);
       });
   }
 

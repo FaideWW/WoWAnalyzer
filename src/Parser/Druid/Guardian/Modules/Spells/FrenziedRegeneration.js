@@ -89,9 +89,21 @@ class FrenziedRegeneration extends Analyzer {
     return this.castData.filter(cast => cast.percentHeal <= HEAL_THRESHOLD && cast.percentHP >= HP_THRESHOLD);
   }
 
-  suggestions(when) {
+  get suggestionThresholds() {
     const inefficiency = this.inefficientCasts.length / this.castData.length;
-    when(inefficiency).isGreaterThan(0)
+    return {
+      actual: inefficiency,
+      isGreaterThan: {
+        minor: 0,
+        average: 0.05,
+        major: 0.1,
+      },
+      style: 'percentage',
+    };
+  }
+
+  suggestions(when) {
+    when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
         return suggest(
           <Wrapper>
@@ -100,8 +112,7 @@ class FrenziedRegeneration extends Analyzer {
         )
           .icon(SPELLS.FRENZIED_REGENERATION.icon)
           .actual(`${formatPercentage(actual, 0)}% of casts had a predicted heal of less than ${formatPercentage(HEAL_THRESHOLD, 0)}% and were cast above ${formatPercentage(HP_THRESHOLD, 0)}% HP`)
-          .recommended(`${recommended}% is recommended`)
-          .regular(recommended + 0.05).major(recommended + 0.1);
+          .recommended(`${recommended}% is recommended`);
       });
   }
 }
