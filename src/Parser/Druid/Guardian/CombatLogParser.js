@@ -5,6 +5,7 @@ import DamageDone from 'Parser/Core/Modules/DamageDone';
 import DamageTaken from 'Parser/Core/Modules/DamageTaken';
 
 import Abilities from './Modules/Abilities';
+import CooldownThroughputTracker from './Modules/Features/CooldownThroughputTracker';
 import ActiveTargets from './Modules/Features/ActiveTargets';
 import Gore from './Modules/Features/Gore';
 import GalacticGuardian from './Modules/Features/GalacticGuardian';
@@ -40,6 +41,7 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Features
     activeTargets: ActiveTargets,
+    cooldownThroughputTracker: CooldownThroughputTracker,
     goreProcs: Gore,
     galacticGuardianProcs: GalacticGuardian,
     guardianOfEluneProcs: GuardianOfElune,
